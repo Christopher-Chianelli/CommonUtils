@@ -1,0 +1,9 @@
+#!/bin/sh
+PORT=$1
+LAG=$2
+for device in `get-network-devices`
+do
+    sudo tc qdisc add dev $device root handle 1: prio priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    sudo tc qdisc add dev $device parent 1:2 handle 20: netem delay $LAG
+    sudo tc filter add dev $device parent 1:0 protocol ip u32 match ip dport $PORT 0xffff flowid 1:2
+done
